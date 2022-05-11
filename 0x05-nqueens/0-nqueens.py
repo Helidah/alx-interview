@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''solving nqueens problem''nd giving a solution'
+'''solving nqueens problem'''
 import sys
 
 
