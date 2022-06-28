@@ -1,65 +1,86 @@
 #!/usr/bin/python3
+"""
+Module 0-prime_game
+"""
 
 
-def isWinner(x, nums):
-    '''finds the winner'''
-    winnerCounter = {'Maria': 0, 'Ben': 0}
-
-    for i in range(x):
-        roundWinner = isRoundWinner(nums[i], x)
-        if roundWinner is not None:
-            winnerCounter[roundWinner] += 1
-
-    if winnerCounter['Maria'] > winnerCounter['Ben']:
-        return 'Maria'
-    elif winnerCounter['Ben'] > winnerCounter['Maria']:
-        return 'Ben'
-    else:
-        return None
+def isPrime(num):
+    """
+    checks if a num
+    is a prime number
+    """
+    if num < 2:
+        return False
+    for i in range(2, num):
+        if (num % i) == 0:
+            return False
+    return True
 
 
-def isRoundWinner(n, x):
-    '''find round winner'''
-    list = [i for i in range(1, n + 1)]
-    players = ['Maria', 'Ben']
-
-    for i in range(n):
-        # get current player
-        currentPlayer = players[i % 2]
-        selectedIdxs = []
-        prime = -1
-        for idx, num in enumerate(list):
-            # if already picked prime num then
-            # find if num is multipl of the prime num
-            if prime != -1:
-                if num % prime == 0:
-                    selectedIdxs.append(idx)
-            # else check is num is prime then pick it
-            else:
-                if isPrime(num):
-                    selectedIdxs.append(idx)
-                    prime = num
-        # if failed to pick then current player lost
-        if prime == -1:
-            if currentPlayer == players[0]:
-                return players[1]
-            else:
-                return players[0]
-        else:
-            for idx, val in enumerate(selectedIdxs):
-                del list[val - idx]
+def getPrime(ints):
+    """
+    Returns a prime number
+    from a set
+    """
+    for n in ints:
+        if isPrime(n):
+            return n
     return None
 
 
-def isPrime(n):
-    # 0, 1, even numbers greater than 2 are NOT PRIME
-    if n == 1 or n == 0 or (n % 2 == 0 and n > 2):
-        return False
-    else:
-        # Not prime if divisable by another number less
-        # or equal to the square root of itself.
-        # n**(1/2) returns square root of n
-        for i in range(3, int(n**(1/2))+1, 2):
-            if n % i == 0:
-                return "Not prime"
-        return True
+def removePrimeNo(ints, prime):
+    """
+    removes a prime number from a set
+    """
+    ints.remove(prime)
+
+
+def removeMultiples(ints, number, player):
+    """removes multiples of a number"""
+    for x in ints.copy():
+        if (x % number) == 0:
+            # print(f"{player} removes {x}")
+            ints.remove(x)
+
+
+def isWinner(x, nums):
+    """
+    Determines the winner
+    """
+    m_wins = 0
+    b_wins = 0
+    canPlay = True
+    times = 0
+
+    if not x or not nums:
+        return None
+
+    for n in nums:
+        ints = set([n for n in range(1, n + 1)])
+        player = "m"
+        while times <= x:
+            prime = getPrime(ints)
+            # A win for the other player
+            # when no more prime numbers exist
+            # print(f"{player} picks {prime}")
+            if prime is None:
+                if player == "m":
+                    b_wins += 1
+                else:
+                    m_wins += 1
+                break
+            # remove prime number
+            # print(f"{player} removes {prime}")
+            removePrimeNo(ints, prime)
+            removeMultiples(ints, prime, player)
+
+            if player == "b":
+                player = "m"
+            else:
+                player = "b"
+            times += 1
+        times = 0
+
+    if m_wins == b_wins:
+        return None
+    return "Maria" if m_wins > b_wins else "Ben"
